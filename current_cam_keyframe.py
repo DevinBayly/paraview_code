@@ -1,7 +1,7 @@
 from paraview.simple import *
 kf = CameraKeyFrame()
 anim = GetAnimationScene()
-kf.KeyTime = anim.AnimationTime
+kf.KeyTime = anim.AnimationTime/anim.EndTime
 print(kf.KeyTime)
 rv = GetActiveViewOrCreate("RenderView")
 print(rv)

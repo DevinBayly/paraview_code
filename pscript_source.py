@@ -8,16 +8,19 @@ def GetUpdateTimestep(algorithm):
 # This is the requested time-step. This may not be exactly equal to the
 # timesteps published in RequestInformation(). Your code must handle that
 # correctly.
-req_time = GetUpdateTimestep(self)
+req_time = int(GetUpdateTimestep(self))
 #print(req_time)
 from pathlib import Path
 import numpy as np
 
 from vtk.numpy_interface import algorithms as algs
 from vtk.numpy_interface import dataset_adapter as dsa
-pth = Path.home()/"Downloads/lidar_data"
-npy_pcls = list(Path(pth).rglob("*.npy"))
-npy_pcl = [npy for npy in npy_pcls if req_time == float(f"{npy.stem}")][0]
+def srtkey(a):
+    return str(a)
+pth = Path("/xdisk/chrisreidy/baylyd/Sama_lidar/temp/babel_pcl")
+npy_pcls = sorted(list(Path(pth).rglob("*.npy")),key=srtkey)
+
+npy_pcl =  npy_pcls[req_time]
 all_data = np.load(npy_pcl)
 data = all_data[:,:3]
 intensity = all_data[:,3]

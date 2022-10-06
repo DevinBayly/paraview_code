@@ -15,8 +15,9 @@ def setOutputTimesteps(algorithm, timesteps):
 
 # As an example, let's say we have 4 files in the file series that we
 # want to say are producing time 0, 10, 20, and 30.
-pth = Path.home()/"Downloads/lidar_data"
+pth = Path("/xdisk/chrisreidy/baylyd/Sama_lidar/temp/babel_pcl")
 npy_pcls = list(Path(pth).rglob("*.npy"))
-times = [float(f.stem) for f in npy_pcls]
+times = [i for i,f in enumerate(npy_pcls)]
 print("times are",times)
 setOutputTimesteps(self, times)
+
