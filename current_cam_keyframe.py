@@ -17,7 +17,7 @@ print(campos,camfoc)
 pscale = rv.CameraParallelScale
 # typically the camera will have been added after the default one
 # todo figure out a better way to select by name Camera
-cue = anim.Cues[1]
+cue = GetCameraTrack(view = rv)
 print(cue)
 cue.KeyFrames.append(kf)
 print("appended frame")
