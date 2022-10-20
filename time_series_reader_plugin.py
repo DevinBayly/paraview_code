@@ -29,14 +29,14 @@ def createModifiedCallback(anobject):
 #   @smproxy.source(name="PythonnumpyReader", label="Python-based numpy Reader")
 #   @smhint.xml("""<ReaderFactory extensions="csv" file_description="Numpy numpy files" />""")
 # or directly use the "@reader" decorator.
-@smproxy.reader(name="Sama Lidar Numpy Reader", label="Python-based numpy pcd Reader",
+@smproxy.reader(name="Sama Lidar Numpy Reader", label="Python-based numpy pcd Reader for timeseries data",
                 extensions="npy",
                  file_description="numpy files")
 class PythonNumpyPCDReader(VTKPythonAlgorithmBase):
     """A reader that reads a numpy file. If the numpy has a "time" column, then
     the data is treated as a temporal dataset"""
     def __init__(self):
-        VTKPythonAlgorithmBase.__init__(self, nInputPorts=0, nOutputPorts=1, outputType='vtkTable')
+        VTKPythonAlgorithmBase.__init__(self, nInputPorts=0, nOutputPorts=1, outputType='vtkPolyData')
         self._filename = None
         self._ndata = None
         self._timesteps = None
@@ -141,20 +141,37 @@ class PythonNumpyPCDReader(VTKPythonAlgorithmBase):
 
     def RequestData(self, request, inInfoVec, outInfoVec):
         print("requesting data")
-        from vtkmodules.vtkCommonDataModel import vtkTable
+        from vtkmodules.vtkCommonDataModel import vtkPolyData
         from vtkmodules.numpy_interface import dataset_adapter as dsa
+        import vtk
 
         data_time = self._get_update_time(outInfoVec.GetInformationObject(0))
-        raw_data = self._get_raw_data(data_time)
-        output = dsa.WrapDataObject(vtkTable.GetData(outInfoVec, 0))
-        print(raw_data)
-        # for name in raw_data.dtype.names:
-        #     if self._arrayselection.ArrayIsEnabled(name):
-        #         output.RowData.append(raw_data[name], name)
-        output.RowData.append(raw_data[:,0],"x")
-        output.RowData.append(raw_data[:,1],"y")
-        output.RowData.append(raw_data[:,2],"z")
-        output.RowData.append(raw_data[:,3],"intensity")
+
+        output = dsa.WrapDataObject(vtkPolyData.GetData(outInfoVec, 0))
+        points = self._get_raw_data(data_time)
+        #points = self._ndata
+        
+        vpoints = vtk.vtkPoints()
+        vpoints.SetNumberOfPoints(points.shape[0])
+        intensity = vtk.vtkFloatArray()
+        intensity.SetNumberOfComponents(1)
+        intensity.SetName("Intensity")
+        intensity.SetNumberOfTuples(points.shape[0])
+        for i in range(points.shape[0]):
+            vpoints.SetPoint(i, points[i][:3])
+            intensity.SetTuple1(i, points[i][3])
+
+        output.GetPointData().SetScalars(intensity)
+
+        output.SetPoints(vpoints)
+        
+        vcells = vtk.vtkCellArray()
+        
+        for i in range(points.shape[0]):
+            vcells.InsertNextCell(1)
+            vcells.InsertCellPoint(i)
+            
+        output.SetVerts(vcells)
 
         if data_time is not None:
             output.GetInformation().Set(output.DATA_TIME_STEP(), data_time)
