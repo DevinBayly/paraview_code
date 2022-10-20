@@ -153,8 +153,16 @@ class PythonNumpyPCDReader(VTKPythonAlgorithmBase):
         
         vpoints = vtk.vtkPoints()
         vpoints.SetNumberOfPoints(points.shape[0])
+        intensity = vtk.vtkFloatArray()
+        intensity.SetNumberOfComponents(1)
+        intensity.SetName("Intensity")
+        intensity.SetNumberOfTuples(points.shape[0])
         for i in range(points.shape[0]):
             vpoints.SetPoint(i, points[i][:3])
+            intensity.SetTuple1(i, points[i][3])
+
+        output.GetPointData().SetScalars(intensity)
+
         output.SetPoints(vpoints)
         
         vcells = vtk.vtkCellArray()
