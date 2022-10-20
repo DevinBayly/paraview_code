@@ -36,7 +36,7 @@ class PythonNumpyPCDFullModelReader(VTKPythonAlgorithmBase):
     """A reader that reads a numpy file. If the numpy has a "time" column, then
     the data is treated as a temporal dataset"""
     def __init__(self):
-        VTKPythonAlgorithmBase.__init__(self, nInputPorts=0, nOutputPorts=1, outputType='vtkTable')
+        VTKPythonAlgorithmBase.__init__(self, nInputPorts=0, nOutputPorts=1, outputType='vtkPolyData')
         self._filename = None
         self._ndata = None
         print("starting",uuid.uuid1())
@@ -48,7 +48,7 @@ class PythonNumpyPCDFullModelReader(VTKPythonAlgorithmBase):
     def _get_raw_data(self, requested_time=None):
 
         # self._ndata = numpy.genfromtxt(self._filename, dtype=None, names=True, delimiter=',', autostrip=True)
-        self.pth = Path(self._filename)
+        self.pth = Path(self._filename)  # type: ignore
         self._ndata = np.load(self.pth)
 
         return self._ndata
@@ -68,19 +68,26 @@ class PythonNumpyPCDFullModelReader(VTKPythonAlgorithmBase):
 
     def RequestData(self, request, inInfoVec, outInfoVec):
         print("requesting data")
-        from vtkmodules.vtkCommonDataModel import vtkTable
+        from vtkmodules.vtkCommonDataModel import vtkPolyData
         from vtkmodules.numpy_interface import dataset_adapter as dsa
+        import vtk
 
-        output = dsa.WrapDataObject(vtkTable.GetData(outInfoVec, 0))
+        output = dsa.WrapDataObject(vtkPolyData.GetData(outInfoVec, 0))
         self._get_raw_data()
-        raw_data = self._ndata
-        print(raw_data)
-        # for name in raw_data.dtype.names:
-        #     if self._arrayselection.ArrayIsEnabled(name):
-        #         output.RowData.append(raw_data[name], name)
-        output.RowData.append(raw_data[:,0],"x")
-        output.RowData.append(raw_data[:,1],"y")
-        output.RowData.append(raw_data[:,2],"z")
-        output.RowData.append(raw_data[:,3],"intensity")
+        points = self._ndata
+        
+        vpoints = vtk.vtkPoints()
+        vpoints.SetNumberOfPoints(points.shape[0])
+        for i in range(points.shape[0]):
+            vpoints.SetPoint(i, points[i])
+        output.SetPoints(vpoints)
+        
+        vcells = vtk.vtkCellArray()
+        
+        for i in range(points.shape[0]):
+            vcells.InsertNextCell(1)
+            vcells.InsertCellPoint(i)
+            
+        output.SetVerts(vcells)
 
         return 1
