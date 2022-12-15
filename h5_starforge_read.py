@@ -4,7 +4,7 @@ import numpy as np
 from vtk.numpy_interface import algorithms as algs
 from vtk.numpy_interface import dataset_adapter as dsa
 
-pth = Path.home().rglob("*position*h5")
+pth = list(Path.home().rglob("*position*h5"))[0]
 f = h5py.File(str(pth))
 keys = list(f.keys())
 

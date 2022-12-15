@@ -1,7 +1,16 @@
 # state file generated using paraview version 5.11.0-RC2
 import paraview
+import argparse
 paraview.compatibility.major = 5
 paraview.compatibility.minor = 11
+
+### these are rendering arguments that we should use
+parser = argparse.ArgumentParser()
+parser.add_argument("file_in")
+parser.add_argument("file_out")
+
+args = parser.parse_args()
+
 
 #### import the simple module from the paraview
 from paraview.simple import *
@@ -51,13 +60,13 @@ SetActiveView(renderView1)
 
 # create a new 'Programmable Source'
 programmableSource1 = ProgrammableSource(registrationName='ProgrammableSource1')
-programmableSource1.Script = """import h5py
+programmableSource1.Script = f"""import h5py
 from pathlib import Path
 import numpy as np
 from vtk.numpy_interface import algorithms as algs
 from vtk.numpy_interface import dataset_adapter as dsa
 
-pth = list(Path.home().rglob("*position*h5"))[0]
+pth = Path("{args.file_in}")
 f = h5py.File(str(pth))
 keys = list(f.keys())
 
@@ -237,3 +246,4 @@ SetActiveSource(programmableFilter1)
 if __name__ == '__main__':
     # generate extracts
     SaveExtracts(ExtractsOutputDirectory='extracts')
+    WriteImage(f"{args.fname_out}.png")
