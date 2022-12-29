@@ -1,0 +1,33 @@
+## place a circle of points around a location to assist with rotating camera correctly for renders
+
+import numpy as np
+from paraview.simple import *
+spheres = []
+
+num = 5
+center = np.random.random((2))*20
+colors = [
+[1,0,0],
+[1,1,0],
+[0,1,0],
+[0,1,1],
+[0,0,1]
+]
+R = 10
+renderView1 = GetActiveView()
+for i in range(num):
+  s = Sphere()
+  s.Radius = 2
+  theta = i/num*2*np.pi
+  v = np.array([np.cos(theta),np.sin(theta)])*R + center
+  print(v)
+  
+  s.Center = [v[0],v[1],0]
+
+# get display properties
+  sphere5Display = GetDisplayProperties(s, view=renderView1)
+
+# change solid color
+  sphere5Display.AmbientColor = colors[i]
+  sphere5Display.DiffuseColor = colors[i]
+  Show()
