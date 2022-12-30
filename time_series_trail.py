@@ -55,12 +55,12 @@ class PythonNumpyPCDReader(VTKPythonAlgorithmBase):
                 if starti < 0:
                   starti = 0
                 endi = int(requested_time)
-                self._ndata = np.zeros((1,3)).astype("float32")
+                self._ndata = numpy.zeros((1,3)).astype("float32")
                 for timei in range(starti,endi):
                   fname = self.fnames[timei]
                   # load several numpy files and stack the results
                   arr =numpy.load(fname)
-                  self._ndata = np.row_stack([self._ndata,arr])
+                  self._ndata = numpy.row_stack([self._ndata,arr])
                 print(self._ndata.dtype)
                 # self._ndata.dtype = numpy.dtype([("x",numpy.float32),("y",numpy.float32),("z",numpy.float32),("intensity",numpy.float32)])
                 return self._ndata
