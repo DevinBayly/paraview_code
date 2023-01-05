@@ -26,6 +26,7 @@ def createModifiedCallback(anobject):
     return _markmodified
 
 def makepcloud(pcd_name):
+    import numpy as np
     with open(pcd_name,"rb") as phile:
         line = phile.readline()
         header = []
@@ -171,6 +172,7 @@ class PythonNumpyPCDReader(VTKPythonAlgorithmBase):
         from vtkmodules.vtkCommonDataModel import vtkPolyData
         from vtkmodules.numpy_interface import dataset_adapter as dsa
         import vtk
+        import numpy as np
 
         data_time = self._get_update_time(outInfoVec.GetInformationObject(0))
 
