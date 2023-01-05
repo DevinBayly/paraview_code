@@ -175,7 +175,10 @@ class PythonNumpyPCDReader(VTKPythonAlgorithmBase):
         data_time = self._get_update_time(outInfoVec.GetInformationObject(0))
 
         output = dsa.WrapDataObject(vtkPolyData.GetData(outInfoVec, 0))
-        points = self._get_raw_data(data_time)
+        all_data = self._get_raw_data(data_time)
+        data = np.column_stack([all_data["x"],all_data["y"],all_data["z"]])
+        intensity = all_data["intensity"]
+        reflectivity = all_data["reflectivity"]
         #points = self._ndata
         
         pts = vtk.vtkPoints()
