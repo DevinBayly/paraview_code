@@ -5,7 +5,10 @@ import uuid
 rv = GetActiveViewOrCreate("RenderView")
 anim = GetAnimationScene()
 ocam = GetCameraTrack(view=rv)
-anim_files = list(Path(Path.home()/".config/Paraview/Animation_Cues/").rglob("paraview_animation_*"))
+src = GetActiveSource()
+pxm = servermanager.ProxyManager()
+name = pxm.GetProxyName("sources",src)
+anim_files = list(Path(Path.home()/".config/Paraview/Animation_Cues/").rglob(f"paraview_animation_{name}*"))
 for a in anim_files:
   cue = CameraAnimationCue()
   cue.Mode = ocam.Mode
