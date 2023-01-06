@@ -76,15 +76,6 @@ class PythonNumpyPCDReader(VTKPythonAlgorithmBase):
 
     def _get_raw_data(self, requested_time=None):
         import numpy
-        if self._ndata is not None:
-            if requested_time is not None:
-                ##### load specific npy file from fnmes
-                self._ndata = makepcloud(self.fname)
-                print(self._ndata.dtype)
-                # self._ndata.dtype = numpy.dtype([("x",numpy.float32),("y",numpy.float32),("z",numpy.float32),("intensity",numpy.float32)])
-                return self._ndata
-            return self._ndata
-
         if self._filename is None:
             # Note, exceptions are totally fine!
             raise RuntimeError("No filename specified")
@@ -93,7 +84,8 @@ class PythonNumpyPCDReader(VTKPythonAlgorithmBase):
         self.pth = Path(self._filename)
         self.fname = self.pth
 
-        return self._get_raw_data(0)
+        self._ndata = makepcloud(self.fname)
+        return self._ndata
 
     def _get_timesteps(self):
         self._get_raw_data()
@@ -171,9 +163,12 @@ class PythonNumpyPCDReader(VTKPythonAlgorithmBase):
 
         output = dsa.WrapDataObject(vtkPolyData.GetData(outInfoVec, 0))
         all_data = self._get_raw_data(0)
+        fields=all_data.dtype.fields 
+        print(fields)
         data = np.column_stack([all_data["x"],all_data["y"],all_data["z"]])
-        intensity = all_data["intensity"]
-        reflectivity = all_data["reflectivity"]
+        if fields.get("reflectivity",None):
+          intensity = all_data["intensity"]
+          reflectivity = all_data["reflectivity"]
         #points = self._ndata
         
         pts = vtk.vtkPoints()
@@ -190,9 +185,15 @@ class PythonNumpyPCDReader(VTKPythonAlgorithmBase):
         output.Allocate(1)
         output.InsertNextCell(vtk.VTK_POLY_VERTEX,ids)
         #add scalar data to output
-        output.PointData.append(intensity,"intensity")
-        output.PointData.append(reflectivity,"reflectivity")
+        if fields.get("reflectivity",None):
+          output.PointData.append(intensity,"intensity")
+          output.PointData.append(reflectivity,"reflectivity")
 
-        if data_time is not None:
-            output.GetInformation().Set(output.DATA_TIME_STEP(), data_time)
         return 1
+
+
+
+
+
+
+
