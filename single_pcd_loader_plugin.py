@@ -93,7 +93,7 @@ class PythonNumpyPCDReader(VTKPythonAlgorithmBase):
         self.pth = Path(self._filename)
         self.fname = self.pth
 
-        return self._get_raw_data(requested_time)
+        return self._get_raw_data(0)
 
     def _get_timesteps(self):
         self._get_raw_data()
@@ -169,10 +169,8 @@ class PythonNumpyPCDReader(VTKPythonAlgorithmBase):
         import vtk
         import numpy as np
 
-        data_time = self._get_update_time(outInfoVec.GetInformationObject(0))
-
         output = dsa.WrapDataObject(vtkPolyData.GetData(outInfoVec, 0))
-        all_data = self._get_raw_data(data_time)
+        all_data = self._get_raw_data(0)
         data = np.column_stack([all_data["x"],all_data["y"],all_data["z"]])
         intensity = all_data["intensity"]
         reflectivity = all_data["reflectivity"]
