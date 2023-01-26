@@ -180,7 +180,6 @@ class PythonNumpyPCDReader(VTKPythonAlgorithmBase):
         all_data = self._get_raw_data(data_time)
         data = np.column_stack([all_data["x"],all_data["y"],all_data["z"]])
         intensity = all_data["intensity"]
-        reflectivity = all_data["reflectivity"]
         #points = self._ndata
         
         pts = vtk.vtkPoints()
@@ -198,7 +197,6 @@ class PythonNumpyPCDReader(VTKPythonAlgorithmBase):
         output.InsertNextCell(vtk.VTK_POLY_VERTEX,ids)
         #add scalar data to output
         output.PointData.append(intensity,"intensity")
-        output.PointData.append(reflectivity,"reflectivity")
 
         if data_time is not None:
             output.GetInformation().Set(output.DATA_TIME_STEP(), data_time)
