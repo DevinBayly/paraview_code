@@ -1,13 +1,12 @@
-table = vtk.vtkTable()
-
+table = output
 table.SetNumberOfRows(5)
 cols = []
 for i in range(20):
     arr = vtk.vtkStringArray()
     arr.SetNumberOfValues(5)
 
-    for i in range(5):
-        arr.SetValue(i,"random info")
+    for j in range(5):
+        arr.SetValue(j,"random info")
     
     arr.SetName("test"+str(i))
     output.AddColumn(arr)
@@ -17,4 +16,3 @@ for j,arr in enumerate(cols):
     for i in range(5):
         print(j)
         table.SetValue(i,j,arr.GetValue(i))
-
