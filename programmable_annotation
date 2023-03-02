@@ -1,0 +1,7 @@
+# this text would go in a programmable annotation filter in paraview, this would need to receive table input and would in turn put the first cell as text in the viewport
+input1 = inputs[0]
+
+to = self.GetTableOutput()
+arr = input1.GetColumn(0)
+
+to.AddColumn(arr)
